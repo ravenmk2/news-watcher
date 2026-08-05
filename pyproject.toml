@@ -1,0 +1,41 @@
+[project]
+name = "news-watcher"
+version = "0.1.0"
+description = "资讯观察和通知服务：多来源抓取、多目标通知、规则分发"
+authors = [
+    { name = "Raven", email = "357679715@qq.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "apscheduler>=3.11.3",
+    "beautifulsoup4>=4.15.0",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "loguru>=0.7.3",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.2",
+    "uvicorn>=0.52.1",
+]
+
+[project.scripts]
+news-watcher = "news_watcher.main:main"
+
+[tool.uv]
+# 锁定包源为阿里云镜像，避免受系统级 uv 配置（如内网镜像）影响，保证 Docker 构建可复现
+[[tool.uv.index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
+default = true
+
+[build-system]
+requires = ["uv_build>=0.11.29,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "respx>=0.23.1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

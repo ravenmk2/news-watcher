@@ -1,0 +1,50 @@
+# news-watcher 配置样例
+# 使用方式：复制为 config.toml 后按需修改。
+# 配置文件路径可用环境变量 NEWS_WATCHER_CONFIG 指定（默认 ./config.toml）。
+
+[server]
+# 服务端口，可被环境变量 NEWS_WATCHER_PORT 覆盖
+port = 8000
+
+[storage]
+# 数据目录，数据库文件名固定为 <dir>/news_watcher.db
+# Docker 中建议指向挂载卷（如 /app/data）
+dir = "data"
+
+# ---- 新闻来源 ----
+# 每个 [sources.<name>] 定义一种来源实例。
+# type: 来源类型（可用: demo, deepseek_update）
+# cron: 抓取时机，5 段式 cron 表达式
+# 其余字段作为该来源组件的参数透传。
+[sources.demo]
+type = "demo"
+cron = "*/2 * * * *"
+batch_size = 3
+
+[sources.deepseek]
+type = "deepseek_update"
+cron = "13 9 * * *"
+
+# ---- 投递目标（target）----
+# 每个 [targets.<name>] 定义一个投递目标，同一类型可配置多个。
+# target 不一定是直接发通知：可以是机器人推送、日志打印等。
+# type = "dingtalk" 时必填 access_token；secret 可选（开启加签时填写）。
+# type = "print" 时只打印日志，可选 level（默认 INFO）。
+[targets.console]
+type = "print"
+
+[targets.dt_ops]
+type = "dingtalk"
+access_token = "在这里填入钉钉机器人的 access_token"
+# secret = "SEC..."
+
+# ---- 规则 ----
+# 每个 [rules.<rule_name>] 是一条规则（名称使用英文标识符）：
+# 来源产生新条目（首次抓取的基线除外）时向所有 target 投递。
+[rules.demo_news]
+source = "demo"
+targets = ["console"]
+
+[rules.deepseek_updates]
+source = "deepseek"
+targets = ["console", "dt_ops"]
