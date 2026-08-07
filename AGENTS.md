@@ -29,7 +29,7 @@ tests/                 # pytest，asyncio_mode = "auto"
 - **首抓忽略**：`source_state.initialized` 为假时，抓到的条目全部入库作基线、不投递（pipeline 中实现，不要在来源组件里处理）。
 - **异常隔离**：单来源抓取失败、单 target 投递失败都只记日志，不影响其他来源/target（`run_source_safe` + `asyncio.gather(return_exceptions=True)`）。
 - 数据库不用复合主键：`news` 表用自增代理主键 + 唯一索引；存储配置只给目录（`[storage] dir`），库名固定 `news_watcher.db`。
-- 规则为命名表 `[rules.<rule_name>]`（英文标识符），`AppConfig.rules: dict[str, RuleConfig]`。
+- 规则为命名表 `[rules.<rule_name>]`（英文标识符），`AppConfig.rules: dict[str, RuleConfig]`；`sources`/`targets` 均为列表，一条规则可匹配多个来源。
 - 新增代码走异步（httpx），存储层 sqlite3 同步调用可接受（毫秒级）。
 
 ## 新增一种来源

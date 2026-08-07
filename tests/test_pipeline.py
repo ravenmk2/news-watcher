@@ -64,7 +64,7 @@ def storage():
 async def test_first_fetch_is_baseline_without_notify(storage):
     source = FakeSource("s1", [[item("a"), item("b")]])
     target = FakeTarget("n1")
-    rules = {"r1": RuleConfig(source="s1", targets=["n1"])}
+    rules = {"r1": RuleConfig(sources=["s1"], targets=["n1"])}
 
     new = await run_source(source, storage, {"n1": target}, rules)
 
@@ -77,7 +77,7 @@ async def test_first_fetch_is_baseline_without_notify(storage):
 async def test_second_fetch_notifies_only_new_items(storage):
     source = FakeSource("s1", [[item("a")], [item("a"), item("b")]])
     target = FakeTarget("n1")
-    rules = {"r1": RuleConfig(source="s1", targets=["n1"])}
+    rules = {"r1": RuleConfig(sources=["s1"], targets=["n1"])}
 
     await run_source(source, storage, {"n1": target}, rules)
     new = await run_source(source, storage, {"n1": target}, rules)
@@ -90,7 +90,7 @@ async def test_second_fetch_notifies_only_new_items(storage):
 async def test_multiple_targets_and_failure_isolation(storage):
     source = FakeSource("s1", [[], [item("a")]])
     ok, bad = FakeTarget("n1"), FakeTarget("n2", fail=True)
-    rules = {"r1": RuleConfig(source="s1", targets=["n1", "n2"])}
+    rules = {"r1": RuleConfig(sources=["s1"], targets=["n1", "n2"])}
 
     await run_source(source, storage, {"n1": ok, "n2": bad}, rules)
     new = await run_source(source, storage, {"n1": ok, "n2": bad}, rules)
@@ -102,7 +102,7 @@ async def test_multiple_targets_and_failure_isolation(storage):
 async def test_stateful_source_skips_db_compare_and_persists_state(storage):
     source = StatefulSource("s1", [item("a")])
     target = FakeTarget("n1")
-    rules = {"r1": RuleConfig(source="s1", targets=["n1"])}
+    rules = {"r1": RuleConfig(sources=["s1"], targets=["n1"])}
 
     await run_source(source, storage, {"n1": target}, rules)
     assert storage.get_state("s1") == {"seen": ["a"]}
@@ -116,7 +116,7 @@ async def test_stateful_source_skips_db_compare_and_persists_state(storage):
 async def test_stateful_source_reports_new_items(storage):
     source = StatefulSource("s1", [item("a")])
     target = FakeTarget("n1")
-    rules = {"r1": RuleConfig(source="s1", targets=["n1"])}
+    rules = {"r1": RuleConfig(sources=["s1"], targets=["n1"])}
     await run_source(source, storage, {"n1": target}, rules)
 
     source._all.append(item("b"))
@@ -124,6 +124,23 @@ async def test_stateful_source_reports_new_items(storage):
 
     assert [it.id for it in new] == ["b"]
     assert storage.get_state("s1") == {"seen": ["a", "b"]}
+
+
+async def test_rule_matches_multiple_sources(storage):
+    """一条规则可匹配多个来源，各来源的新条目都投递到规则的 targets。"""
+    s1 = FakeSource("s1", [[item("x1")], [item("x1"), item("a")]])
+    s2 = FakeSource("s2", [[item("x2")], [item("x2"), item("b")]])
+    target = FakeTarget("n1")
+    rules = {"r1": RuleConfig(sources=["s1", "s2"], targets=["n1"])}
+
+    await run_source(s1, storage, {"n1": target}, rules)
+    new1 = await run_source(s1, storage, {"n1": target}, rules)
+    await run_source(s2, storage, {"n1": target}, rules)
+    new2 = await run_source(s2, storage, {"n1": target}, rules)
+
+    assert [it.id for it in new1] == ["a"]
+    assert [it.id for it in new2] == ["b"]
+    assert len(target.received) == 2
 
 
 async def test_run_source_safe_swallows_fetch_errors(storage):

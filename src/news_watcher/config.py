@@ -50,7 +50,7 @@ class TargetConfig(BaseModel):
 
 
 class RuleConfig(BaseModel):
-    source: str
+    sources: list[str]
     targets: list[str]
 
 
@@ -64,8 +64,9 @@ class AppConfig(BaseModel):
     @model_validator(mode="after")
     def _check_rule_refs(self) -> "AppConfig":
         for name, rule in self.rules.items():
-            if rule.source not in self.sources:
-                raise ValueError(f"规则 {name} 引用了未配置的来源: {rule.source}")
+            for source in rule.sources:
+                if source not in self.sources:
+                    raise ValueError(f"规则 {name} 引用了未配置的来源: {source}")
             for target in rule.targets:
                 if target not in self.targets:
                     raise ValueError(f"规则 {name} 引用了未配置的 target: {target}")

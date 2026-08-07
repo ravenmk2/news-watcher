@@ -44,15 +44,11 @@ access_token = "在这里填入钉钉机器人的 access_token"
 
 # ---- 规则 ----
 # 每个 [rules.<rule_name>] 是一条规则（名称使用英文标识符）：
-# 来源产生新条目（首次抓取的基线除外）时向所有 target 投递。
+# sources 中的任一来源产生新条目（首次抓取的基线除外）时向所有 target 投递。
 [rules.demo_news]
-source = "demo"
+sources = ["demo"]
 targets = ["console"]
 
-[rules.deepseek_updates]
-source = "deepseek"
-targets = ["console", "dt_ops"]
-
-[rules.zhipu_releases]
-source = "zhipu"
+[rules.ai_updates]
+sources = ["deepseek", "zhipu"]
 targets = ["console", "dt_ops"]

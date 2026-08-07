@@ -16,9 +16,11 @@ from .targets.base import Target
 def targets_for(
     source_name: str, rules: dict[str, RuleConfig]
 ) -> dict[str, list[str]]:
-    """返回 {规则名: [target 名, ...]}（仅该来源的规则）。"""
+    """返回 {规则名: [target 名, ...]}（仅匹配该来源的规则）。"""
     return {
-        name: rule.targets for name, rule in rules.items() if rule.source == source_name
+        name: rule.targets
+        for name, rule in rules.items()
+        if source_name in rule.sources
     }
 
 
