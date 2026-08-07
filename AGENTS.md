@@ -16,7 +16,7 @@ src/news_watcher/
 ├── scheduler.py       # SourceScheduler：每个来源一条 cron job（CronTrigger.from_crontab）
 ├── api.py             # FastAPI 路由（当前仅 /health）
 ├── logging.py         # loguru 初始化，拦截 uvicorn/apscheduler 标准日志
-├── sources/           # 来源组件：base.py 抽象 + 注册表工厂（__init__.py）+ demo.py / deepseek.py
+├── sources/           # 来源组件：base.py 抽象 + 注册表工厂（__init__.py）+ demo.py / deepseek.py / zhipu.py
 └── targets/            # target 组件：base.py 抽象 + 注册表工厂（__init__.py）+ dingtalk.py / print.py
 tests/                 # pytest，asyncio_mode = "auto"
 ```

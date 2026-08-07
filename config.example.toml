@@ -13,7 +13,7 @@ dir = "data"
 
 # ---- 新闻来源 ----
 # 每个 [sources.<name>] 定义一种来源实例。
-# type: 来源类型（可用: demo, deepseek_update）
+# type: 来源类型（可用: demo, deepseek_update, zhipu_release）
 # cron: 抓取时机，5 段式 cron 表达式
 # 其余字段作为该来源组件的参数透传。
 [sources.demo]
@@ -24,6 +24,10 @@ batch_size = 3
 [sources.deepseek]
 type = "deepseek_update"
 cron = "13 9 * * *"
+
+[sources.zhipu]
+type = "zhipu_release"
+cron = "23 9 * * *"
 
 # ---- 投递目标（target）----
 # 每个 [targets.<name>] 定义一个投递目标，同一类型可配置多个。
@@ -47,4 +51,8 @@ targets = ["console"]
 
 [rules.deepseek_updates]
 source = "deepseek"
+targets = ["console", "dt_ops"]
+
+[rules.zhipu_releases]
+source = "zhipu"
 targets = ["console", "dt_ops"]

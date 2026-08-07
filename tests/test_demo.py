@@ -15,6 +15,6 @@ async def test_demo_fetch_returns_items():
 
 
 def test_source_registry():
-    assert set(available_types()) == {"demo", "deepseek_update"}
+    assert set(available_types()) == {"demo", "deepseek_update", "zhipu_release"}
     source = build_source("demo", SourceConfig(type="demo", cron="* * * * *"))
     assert isinstance(source, DemoSource)

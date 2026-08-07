@@ -29,4 +29,4 @@ def available_types() -> list[str]:
 
 
 # 触发各来源子模块的注册
-from . import demo, deepseek  # noqa: E402, F401
+from . import demo, deepseek, zhipu  # noqa: E402, F401
