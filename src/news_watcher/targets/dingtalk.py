@@ -9,6 +9,7 @@ import urllib.parse
 import httpx
 from loguru import logger
 
+from ..http import USER_AGENT
 from ..models import NewsItem
 from . import register_target
 from .base import Target
@@ -54,7 +55,9 @@ class DingTalkTarget(Target):
     async def send(self, items: list[NewsItem]) -> None:
         if not items:
             return
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(
+            timeout=10, headers={"User-Agent": USER_AGENT}
+        ) as client:
             resp = await client.post(self._url(), json=self.build_message(items))
             resp.raise_for_status()
             data = resp.json()

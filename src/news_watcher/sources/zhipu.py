@@ -11,6 +11,7 @@ from typing import Any
 import httpx
 from bs4 import BeautifulSoup
 
+from ..http import USER_AGENT
 from ..models import NewsItem
 from . import register_source
 from .base import FetchResult, NewsSource
@@ -28,7 +29,9 @@ class ZhipuReleaseSource(NewsSource):
         self.url = url
 
     async def fetch(self, state: dict[str, Any]) -> FetchResult:
-        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=15, follow_redirects=True, headers={"User-Agent": USER_AGENT}
+        ) as client:
             resp = await client.get(self.url)
             resp.raise_for_status()
         entries = self.parse(resp.text)

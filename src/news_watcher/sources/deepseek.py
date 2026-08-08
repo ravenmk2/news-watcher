@@ -1,6 +1,6 @@
 """DeepSeek API 文档更新日志来源。
 
-抓取 https://api-docs.deepseek.com/zh-cn/updates（Docusaurus 静态页面），
+抓取 https://api-docs.deepseek.com/zh-cn/updates/（Docusaurus 静态页面），
 每个 `时间: YYYY-MM-DD` 小节解析为一条新闻。支持状态过滤：state 中持久化
 已见条目 id 列表，fetch 只返回新条目。
 """
@@ -12,11 +12,12 @@ from typing import Any
 import httpx
 from bs4 import BeautifulSoup, Tag
 
+from ..http import USER_AGENT
 from ..models import NewsItem
 from . import register_source
 from .base import FetchResult, NewsSource
 
-DEFAULT_URL = "https://api-docs.deepseek.com/zh-cn/updates"
+DEFAULT_URL = "https://api-docs.deepseek.com/zh-cn/updates/"
 CONTENT_MAX_LEN = 500
 _DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
@@ -30,7 +31,9 @@ class DeepSeekUpdateSource(NewsSource):
         self.url = url
 
     async def fetch(self, state: dict[str, Any]) -> FetchResult:
-        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=15, follow_redirects=True, headers={"User-Agent": USER_AGENT}
+        ) as client:
             resp = await client.get(self.url)
             resp.raise_for_status()
         entries = self.parse(resp.text)
